@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>test</title>
+		<style type="text/css">
+			*{
+				box-sizing: border-box;
+			}
+			#demo {
+				border: 1px solid #009fe8;
+				width: 880px;
+				float: left;
+			}
+			
+			.cf:after,
+			.cf:before {
+				content: "";
+				display: table;
+			}
+			
+			.cf:after {
+				clear: both;
+			}
+			
+			.cf {
+				zoom: 1;
+			}
+			
+			.fl {
+				float: left;
+			}
+			
+			.multiSelect {
+				position: relative;
+				box-sizing: border-box;
+			}
+			
+			.multiSelect .select_list .select_item {
+				margin: 8px 5px;
+				padding: 3px 0 3px 10px;
+				box-shadow: 0 0 1px 1px rgba(0, 0, 0, .3);
+				border-radius: 2px
+			}
+			
+			.multiSelect .select_list .select_item .close {
+				color: #cd2f23;
+				padding: 0 5px;
+				margin-left: 5px
+			}
+			
+			.multiSelect input {
+				padding: 0 10px;
+				outline: 0
+			}
+			
+			.multiSelect .load,
+			.multiSelect .result .result_item {
+				padding: 10px 5px;
+				border-bottom: solid 1px #ccc
+			}
+			
+			.multiSelect .result {
+				position: absolute;
+				left: 0;
+				top: 0;
+				background: #fff;
+				box-shadow: 1px 0 3px rgba(0, 0, 0, .5)
+			}
+			
+			.multiSelect .result .result_item {
+				cursor: pointer
+			}
+			
+			.multiSelect .result .result_item.active,
+			.multiSelect .result .result_item:hover {
+				background: #009fe8;
+				color: #fff
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<div id="demo">
+
+		</div>
+		<script src="http://cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+		<script>
+			;
+			(function(root, factory) {
+				'use strict';
+				if(typeof define === 'function' && define.amd) {
+					define([], factory);
+				} else if(typeof exports === 'object' && typeof require === 'function') {
+					factory();
+				} else {
+					factory();
+				}
+			})(this, function() {
+				$.fn.multiSelect = function(options) {
+					var defaults = {
+						id: "#test",
+						left: 0,
+						top: 2,
+						wid: 200,
+						hei: 38,
+						name: "name",
+						code: "code",
+						max: 9,
+						onInput: function() {},
+					}
+					var options = $.extend(defaults, options);
+					var obj = $(this);
+					//设置html
+					var list_html = "<div class=\"select_list cf\"><input type=\"text\" name=\"\" /></div><div class=\"result\"></div>";
+					var item_html = "<div class=\"select_item fl\" data-code=\"{{code}}\">{{text}}<a href=\"javascript:;\" class=\"close\">×</a></div>";
+					//设置初始变量
+					var $input, $list, $result, txt, search_timer, cur_select = -1,
+						obj_width;
+
+					//方法
+					//插入一个选择项
+					function setItem(item) {
+						if($(".select_item", $list).length < options.max) {
+							$("input", $list).before(item_html.replace("{{text}}", item.name).replace("{{code}}", item.code));
+						}
+						$input.val("");
+						reSize();
+						clear();
+					}
+					//修改下拉框的位置
+					function reSize() {
+						var item_width = 0;
+						var input_width = obj_width;
+						$(".select_item").each(function() {
+							item_width += $(this).width() + 20;
+							if(item_width >= obj_width) item_width = $(this).width() + 20;
+						});
+						if(item_width < obj_width) {
+							input_width = obj_width - item_width;
+						}
+						if(input_width < options.wid) input_width = obj_width;
+						$input.css({
+							width: input_width,
+							height: options.hei
+						});
+						var pos = $input.position();
+						$result.css({
+							left: pos.left + options.left,
+							top: pos.top + $input.height() + options.top
+						});
+					}
+					//加载
+					function loading() {
+						$result.html("<div class=\"load\">Loading...</div>");
+					}
+					//清楚下拉
+					function clear() {
+						cur_select = -1;
+						$result.empty();
+					}
+					//搜索輸入框的內容
+					function search_txt(t) {
+						if(t === "" || t === txt) return clear();
+						loading();
+						if(search_timer) clearTimeout(search_timer);
+						search_timer = setTimeout(function() {
+							options.onInput(t, function(list) {
+								clear();
+								for(var i = 0; i < list.length; i++) {
+									$result.append("<div class=\"result_item\" data-code=\"" + list[i][options.code] + "\">" + list[i][options.name] + "</div>");
+								}
+							});
+						}, 300);
+					};
+					//默认选择或者选择选中
+					function selectDefault() {
+						if($(".result_item", $result).length > 0) {
+							var curr = cur_select == -1 ? 0 : cur_select;
+							var data = $(".result_item", $result).eq(curr);
+							setItem({
+								name: data.text(),
+								code: data.data("code")
+							});
+						}
+					}
+					//调用初始化
+					obj_width = obj.width();
+					obj.addClass("multiSelect");
+					obj.html(list_html);
+					$input = $("input", obj);
+					$list = $(".select_list", obj);
+					$result = $(".result", obj);
+					$result.width(options.wid);
+					//调用默认执行的事件
+					reSize();
+					//添加事件
+					//输入框按键事件
+					$input.keydown(function(e) {
+						switch(e.which) {
+							case 13: //回车
+								e.preventDefault();
+								selectDefault();
+								break;
+							case 38: //shang
+								e.preventDefault();
+								if(cur_select <= 0) return;
+								cur_select--;
+								$(".result_item", $result).removeClass("active").eq(cur_select).addClass("active");
+								break;
+							case 40: //xia
+								e.preventDefault();
+								if(cur_select >= $(".result_item", $result).length - 1) return;
+								cur_select++;
+								$(".result_item", $result).removeClass("active").eq(cur_select).addClass("active");
+								break;
+							case 27: //esc
+								e.preventDefault();
+								clear();
+								$input.val("");
+								break;
+						}
+					}).on("change paste keyup", function(e) {
+						if(e.which != 13 && e.which != 27 && e.which != 38 && e.which != 40 && e.which != undefined) {
+							if(e.which == 8) $input.val('');
+							search_txt($input.val());
+						}
+					}).blur(); //selectDefault
+					//绑定全局事件
+					$list.on("click", ".close", function() {
+						$(this).parent().remove();
+						reSize();
+					});
+					$result.on("click", ".result_item", function() {
+						setItem({
+							name: $(this).text(),
+							code: $(this).data("code")
+						});
+					});
+					return {};
+				}
+			});
+		</script>
+		<script type="text/javascript">
+			$("#demo").multiSelect({
+				onInput: function(t, fn) {
+					var data = [{
+						name: "test" + Math.random(),
+						code: "123"
+					}, {
+						name: "test2",
+						code: "123"
+					}];
+					fn(data);
+				}
+			});
+		</script>
+	</body>
+
+</html>

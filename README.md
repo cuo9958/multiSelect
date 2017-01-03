@@ -5,7 +5,7 @@
 
 简单的使用方法：
 
->var options = {
+> var options = {
 
 >           left: 0, //下拉框的左侧偏移
 
@@ -25,23 +25,23 @@
 
 >            //t:搜索的字符串
 
- >           //服务器返回结果之后的回调
+>           //服务器返回结果之后的回调
             
 >            onInput: function(t,fn) {
 
 >              var data = [{
 
- >               name: "test" + Math.random(),
+>               name: "test" + Math.random(),
  
 >                code: "123"
 
 >              }, {
 
- >               name: "test2",
+>               name: "test2",
  
- >               code: "123"
+>               code: "123"
  
- >             }];
+>             }];
  
 >              fn(data);
 
@@ -49,13 +49,13 @@
 
 >        }
         
->$("#demo").multiSelect({
+> $("#demo").multiSelect({
 
 >    onInput: function(t, fn) {
 
- >       ajax.searchABC(t, function(res) {
+>       ajax.searchABC(t, function(res) {
  
- >           if (res.status.code == 0) {
+>           if (res.status.code == 0) {
  
 >                fn(res.data);
 

@@ -28,7 +28,7 @@
             },
         }
         
-$("#demo").multiSelect({
+>$("#demo").multiSelect({
     onInput: function(t, fn) {
         ajax.searchABC(t, function(res) {
             if (res.status.code == 0) {

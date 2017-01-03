@@ -28,24 +28,42 @@
  >           //服务器返回结果之后的回调
             
 >            onInput: function(t,fn) {
+
 >              var data = [{
+
  >               name: "test" + Math.random(),
+ 
 >                code: "123"
+
 >              }, {
+
  >               name: "test2",
+ 
  >               code: "123"
+ 
  >             }];
+ 
 >              fn(data);
+
 >            },
+
 >        }
         
 >$("#demo").multiSelect({
+
 >    onInput: function(t, fn) {
+
  >       ajax.searchABC(t, function(res) {
+ 
  >           if (res.status.code == 0) {
+ 
 >                fn(res.data);
+
 >            } 
+
 >        });
+
 >    }
+
 >});
 

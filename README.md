@@ -4,8 +4,8 @@
 ![例子](http://img.blog.csdn.net/20170103160657388?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvY3VvOTk1OA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
 
 简单的使用方法：
-`
-var options = {
+
+`var options = {
             left: 0, //下拉框的左侧偏移
             top: 2,//下拉框的顶部偏移
             wid: 200,//下拉框的宽度，输入框的最小宽度跟这个一样
@@ -36,5 +36,5 @@ $("#demo").multiSelect({
             } 
         });
     }
-});
-`
+});`
+
